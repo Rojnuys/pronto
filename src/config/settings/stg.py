@@ -26,7 +26,7 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = PROJECT_DIR / "static"  # NOQA
+STATIC_ROOT = BASE_DIR.parent / "static"  # NOQA
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = PROJECT_DIR / "media"  # NOQA
+MEDIA_ROOT = BASE_DIR.parent / "media"  # NOQA

@@ -36,8 +36,12 @@ DATABASES = {
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
-    PROJECT_DIR / "static",  # NOQA
+    BASE_DIR.parent / "static",  # NOQA
 ]
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = PROJECT_DIR / "media"  # NOQA
+MEDIA_ROOT = BASE_DIR.parent / "media"  # NOQA
+
+GRAPH_MODELS = {
+    "app_labels": ["shop", "accounts"],
+}
