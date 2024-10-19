@@ -41,3 +41,7 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = PROJECT_DIR / "media"  # NOQA
+
+GRAPH_MODELS = {
+    "app_labels": ["shop", "accounts"],
+}
