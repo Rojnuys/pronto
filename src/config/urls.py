@@ -19,6 +19,11 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-urlpatterns = [path("admin/", admin.site.urls), re_path(r"^i18n/", include("django.conf.urls.i18n"))]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("rest_framework.urls")),
+    path("api/", include("api.urls")),
+    re_path(r"^i18n/", include("django.conf.urls.i18n")),
+]
 
 urlpatterns += debug_toolbar_urls()
