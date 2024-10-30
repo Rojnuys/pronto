@@ -7,6 +7,6 @@ RUN apk update
 COPY ./requirements.txt ./requirements.txt
 
 RUN python -m pip install --upgrade pip & pip install -r ./requirements.txt
-EXPOSE 80
+EXPOSE 8000
 
 CMD ["sh"]
