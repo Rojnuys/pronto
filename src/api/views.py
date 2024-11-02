@@ -2,8 +2,10 @@ from rest_framework import status, viewsets
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      RetrieveAPIView, RetrieveDestroyAPIView,
                                      RetrieveUpdateAPIView)
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from api.permissions import IsSuperUser
 from api.serializers import (CategorySerializer, CommentSerializer,
                              CreateProductSerializer, FullProductSerializer,
                              ProductCommentSerializer, ProductImageSerializer,
@@ -18,8 +20,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsSuperUser]
+        return [permission() for permission in permission_classes]
+
 
 class CategoryProductListView(ListAPIView):
+    permission_classes = [AllowAny]
     serializer_class = ProductWithImagesSerializer
 
     def get_queryset(self):
@@ -27,26 +37,31 @@ class CategoryProductListView(ListAPIView):
 
 
 class ProductImageViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsSuperUser]
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
 
 
 class RelatedProductViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsSuperUser]
     queryset = RelatedProduct.objects.all()
     serializer_class = RelatedProductSerializer
 
 
 class ProductListView(ListAPIView):
+    permission_classes = [AllowAny]
     queryset = Product.objects.all()
     serializer_class = ProductWithImagesSerializer
 
 
 class ProductDetailView(RetrieveAPIView):
+    permission_classes = [AllowAny]
     queryset = Product.objects.all()
     serializer_class = FullProductSerializer
 
 
 class ProductCreateView(CreateAPIView):
+    permission_classes = [IsSuperUser]
     queryset = Product.objects.all()
     serializer_class = CreateProductSerializer
 
@@ -64,6 +79,8 @@ class ProductCreateView(CreateAPIView):
 
 
 class ProductUpdateView(RetrieveUpdateAPIView):
+    permission_classes = [IsSuperUser]
+    http_method_names = ["put", "patch"]
     queryset = Product.objects.all()
     serializer_class = CreateProductSerializer
 
@@ -87,10 +104,13 @@ class ProductUpdateView(RetrieveUpdateAPIView):
 
 
 class ProductDeleteView(RetrieveDestroyAPIView):
+    permission_classes = [IsSuperUser]
+    http_method_names = ["delete"]
     queryset = Product.objects.all()
 
 
 class ProductCommentListView(ListAPIView):
+    permission_classes = [AllowAny]
     serializer_class = ProductCommentSerializer
 
     def get_queryset(self):
@@ -98,6 +118,7 @@ class ProductCommentListView(ListAPIView):
 
 
 class ProductRelatedProductListView(ListAPIView):
+    permission_classes = [AllowAny]
     serializer_class = ProductWithImagesSerializer
 
     def get_queryset(self):
@@ -107,5 +128,6 @@ class ProductRelatedProductListView(ListAPIView):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsSuperUser]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
