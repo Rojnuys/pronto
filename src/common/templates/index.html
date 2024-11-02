@@ -1,0 +1,157 @@
+{% load static %}
+{% load get_catalog_data %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pronto{% endblock %}</title>
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/style.css" %}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url "index" %}">Pronto</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav ms-auto catalog">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="catalogDropdown" role="button"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    Catalog
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="catalogDropdown">
+                    {% get_catalog_data as categories %}
+                    {% for category in categories %}
+                        <li class="{% if category.children.count > 1 %}dropdown-submenu{% else %}nav-item{% endif %}">
+                            <a class="{% if category.children.count > 1 %}dropdown-item dropdown-toggle{% else %}nav-link{% endif %}"
+                               href="#">{{ category.name }}</a>
+                            {% if category.children.count > 1 %}
+                                <ul class="dropdown-menu">
+                                    {% for subcategory in category.children.all %}
+                                        <li>
+                                            <a class="dropdown-item" href="#">{{ subcategory.name }}</a>
+                                            <ul>
+                                                {% for subsubcategory in subcategory.children.all %}
+                                                    <li><a href="#">{{ subsubcategory.name }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                    <li class="nav-item"><a class="nav-link" href="{% url "shop:product_list" %}">All products</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Contacts</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    {% block content %}
+        <!-- Carousel (Slider) -->
+        <section id="main-slider" class="mb-5">
+            <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active"
+                            aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"
+                            aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"
+                            aria-label="Slide 3"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="{% static "img/banner1.jpg" %}" class="slide-img d-block w-100" alt="Banner 1">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h3 class="slide-title">Autumn Sales</h3>
+                            <p class="slide-text">Get discounts of up to 50% on office devices!</p>
+                            <a href="#" class="btn btn-primary">See more</a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{% static "img/banner2.jpg" %}" class="slide-img d-block w-100" alt="Banner 2">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h3 class="slide-title">New arrivals</h3>
+                            <p class="slide-text">Smartphones with a new 16Tpx camera!</p>
+                            <a href="#" class="btn btn-primary">See</a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{% static "img/banner3.jpg" %}" class="slide-img  d-block w-100" alt="Banner 3">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h3 class="slide-title">Exclusive products</h3>
+                            <p class="slide-text">Samsung A8000 Starship is now on sale!</p>
+                            <a href="#" class="btn btn-primary">Order now</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Prev</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </section>
+
+        {% if new_products.count > 0 %}
+            <!-- New Products -->
+            <section class="container py-5">
+                <h2 class="text-center mb-4">New products</h2>
+                <div class="row">
+                    {% for product in new_products %}
+                        <div class="col-md-4 mb-4">
+                            {% include "shop/includes/product_card.html" %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if new_products.count > 0 %}
+            <!-- Products on sales -->
+            <section class="container py-5">
+                <h2 class="text-center mb-4">Products on sales</h2>
+                <div class="row">
+                    {% for product in sales_products %}
+                        <div class="col-md-4 mb-4">
+                            {% include "shop/includes/product_card.html" %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    {% endblock %}
+</div>
+
+<footer class="footer text-center mt-5">
+    <div class="container">
+        <p>&copy; 2023 Online shop. All the rights are protected.</p>
+        <p>
+            <a href="#">Facebook</a> |
+            <a href="#">Instagram</a> |
+            <a href="#">Twitter</a>
+        </p>
+    </div>
+</footer>
+
+<script src="{% static "js/bootstrap.bundle.min.js" %}"></script>
+</body>
+</html>

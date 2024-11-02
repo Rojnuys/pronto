@@ -1,0 +1,49 @@
+{% load static %}
+{% load get_random_text %}
+<div class="card product-card">
+    {% if product.images.count > 1 %}
+        {% get_random_text as carousel_id %}
+        <div id="carouselProduct{{ carousel_id }}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image in product.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{% get_media_prefix %}{{ image.image }}" class="d-block w-100"
+                             alt="Product {{ product.pk }}">
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduct{{ carousel_id }}"
+                    data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselProduct{{ carousel_id }}"
+                    data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    {% elif product.images.count == 1 %}
+        <img src="{% get_media_prefix %}{{ product.images.first.image }}" class="card-img-top"
+             alt="Product {{ product.pk }}">
+    {% else %}
+        <img src="{% static "img/defaults/product.jpg" %}" class="card-img-top" alt="Product {{ product.pk }}">
+    {% endif %}
+
+    <div class="card-body text-center">
+        <h5 class="card-title">
+            <a href="{% url "shop:product_detail" pk=product.pk %}">{{ product.name }}</a>
+        </h5>
+        {% if product.is_sale %}
+            <p class="card-text">Price: $<span class="text-decoration-line-through">{{ product.price }}</span>
+                ${{ product.get_price }}</p>
+        {% else %}
+            <p class="card-text">Price: ${{ product.get_price }}</p>
+        {% endif %}
+        {% if product.status == 0 %}
+            <a href="#" class="btn btn-primary">Add to cart</a>
+        {% else %}
+            <p>Unavailable</p>
+        {% endif %}
+    </div>
+</div>

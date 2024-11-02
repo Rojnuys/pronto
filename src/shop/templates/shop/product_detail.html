@@ -1,0 +1,92 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+    <div class="row mt-5">
+        <div class="col-sm-12 col-md-6">
+            {% if product.images.count > 1 %}
+                <div id="carouselProduct" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in product.images.all %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{% get_media_prefix %}{{ image.image }}" class="d-block w-100"
+                                     alt="Product {{ product.pk }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduct"
+                            data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselProduct"
+                            data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            {% elif product.images.count == 1 %}
+                <img src="{% get_media_prefix %}{{ product.images.first.image }}" class="card-img-top"
+                     alt="Product {{ product.pk }}">
+            {% else %}
+                <img src="{% static "img/defaults/product.jpg" %}" class="card-img-top" alt="Product {{ product.pk }}">
+            {% endif %}
+        </div>
+
+        <div class="col-sm-12 col-md-6">
+            <h1 class="product-title">{{ product.name }}</h1>
+            {% if product.is_sale %}
+                <p class="product-price">Price: $<span class="text-decoration-line-through">{{ product.price }}</span>
+                    ${{ product.get_price }}</p>
+            {% else %}
+                <p class="product-price">Price: ${{ product.get_price }}</p>
+            {% endif %}
+            <p class="product-description">
+                {{ product.description }}
+            </p>
+
+            {% if product.status == 0 %}
+                <a href="#" class="btn btn-primary">Add to cart</a>
+            {% else %}
+                <p>Unavailable</p>
+            {% endif %}
+        </div>
+
+        <div class="col mt-5">
+            {% if product.attributes %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Attribute</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for k, v in product.attributes.items %}
+                        <tr>
+                            <td>{{ k }}</td>
+                            <td>{{ v }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+        {% if product.related_products.count > 0 %}
+            <!-- Related products -->
+            <section class="container py-5">
+                <h2 class="text-center mb-4">Related products</h2>
+                <div class="row">
+                    {% for related_product in product.related_products.all %}
+                        <div class="col-md-4 mb-4">
+                            {% include "shop/includes/product_card.html" with product=related_product.related_product %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </div>
+{% endblock %}
