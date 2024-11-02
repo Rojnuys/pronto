@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  python:
+    container_name: python_${PROJECT_NAME}
+    build:
+      context: ./
+      dockerfile: docker/configs/python/Dockerfile
+      args:
+        WORKDIR: ${WORKDIR}
+    ports:
+      - "${HTTP_PORT}:8000"
+    volumes:
+      - ./:${WORKDIR}
+    env_file: .env
+    command: ./commands/start_server_${MODE}.sh
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres_${PROJECT_NAME}
+    image: postgres:16.4
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data: {}
