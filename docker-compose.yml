@@ -11,7 +11,10 @@ services:
     ports:
       - "${HTTP_PORT}:8000"
     volumes:
-      - ./:${WORKDIR}
+      - ./src:${WORKDIR}/src
+      - ./commands:${WORKDIR}/commands
+      - ./static:${WORKDIR}/static
+      - media_content:${WORKDIR}/media
     env_file: .env
     command: ./commands/start_server_${MODE}.sh
     depends_on:
@@ -26,5 +29,44 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  pgadmin:
+    container_name: pgadmin_${PROJECT_NAME}
+    image: dpage/pgadmin4
+    ports:
+      - "${PGADMIN_PORT}:80"
+    volumes:
+      - pg_admin:/var/lib/pgadmin
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: on-failure
+
+  mongo:
+    container_name: mongodb_${PROJECT_NAME}
+    image: mongo:7-jammy
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongo_data:/data/db
+    env_file:
+      - .env
+    restart: on-failure
+
+  mongo_express:
+    container_name: mongo_express_${PROJECT_NAME}
+    image: mongo-express:latest
+    ports:
+      - "${ME_PORT}:8081"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    restart: on-failure
+
+
 volumes:
   pg_data: {}
+  pg_admin: {}
+  mongo_data: {}
+  media_content: {}
