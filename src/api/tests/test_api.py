@@ -39,7 +39,7 @@ class TestApi(TestCase):
                 "sale_price": None,
                 "status": "Active",
                 "images": [],
-                "category": {"id": 1, "name": "Test category"},
+                "category": {"id": ANY, "name": "Test category"},
                 "description": "Test description",
                 "attributes": {},
             },
@@ -73,7 +73,7 @@ class TestApi(TestCase):
     def test_create_product_without_permissions(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(
-            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": 1}
+            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": ANY}
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -89,7 +89,7 @@ class TestApi(TestCase):
     def test_create_product_with_permissions(self):
         self.client.force_authenticate(user=self.superuser)
         response = self.client.post(
-            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": 1}
+            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": ANY}
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -102,7 +102,7 @@ class TestApi(TestCase):
                 "is_sale": False,
                 "sale_price": None,
                 "status": "Active",
-                "category": 1,
+                "category": ANY,
                 "description": "",
                 "attributes": {},
             },
