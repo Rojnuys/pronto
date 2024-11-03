@@ -7,13 +7,16 @@ from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APIClient
 
-from shop.utils.samples import sample_product, sample_related_product
+from shop.utils.samples import (sample_category, sample_product,
+                                sample_related_product)
 
 
 # Create your tests here.
 class TestApi(TestCase):
     def setUp(self):
         self.client = APIClient()
+
+        self.category = sample_category()
 
         self.product = sample_product("Test product")
         self.related_product = sample_related_product()
@@ -39,7 +42,7 @@ class TestApi(TestCase):
                 "sale_price": None,
                 "status": "Active",
                 "images": [],
-                "category": {"id": ANY, "name": "Test category"},
+                "category": {"id": self.category.pk, "name": "Test category"},
                 "description": "Test description",
                 "attributes": {},
             },
@@ -68,12 +71,18 @@ class TestApi(TestCase):
     def test_category_list(self):
         response = self.client.get(reverse("api:category-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [{"id": ANY, "name": "Test category", "parent": None}])
+        self.assertEqual(response.data, [{"id": self.category.pk, "name": "Test category", "parent": None}])
 
     def test_create_product_without_permissions(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(
-            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": ANY}
+            reverse("api:product-create"),
+            {
+                "name": "Test product",
+                "price": 10,
+                "status": "Active",
+                "category": self.category.pk,
+            },
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -89,8 +98,14 @@ class TestApi(TestCase):
     def test_create_product_with_permissions(self):
         self.client.force_authenticate(user=self.superuser)
         response = self.client.post(
-            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": ANY,
-                                            "description": "Test description", "attributes": "{}"}
+            reverse("api:product-create"),
+            {
+                "name": "Test product",
+                "price": 10,
+                "status": "Active",
+                "category": self.category.pk,
+                "description": "Test description",
+            },
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -103,8 +118,8 @@ class TestApi(TestCase):
                 "is_sale": False,
                 "sale_price": None,
                 "status": "Active",
-                "category": ANY,
-                "description": "",
+                "category": self.category.pk,
+                "description": "Test description",
                 "attributes": {},
             },
         )

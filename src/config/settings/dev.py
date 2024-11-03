@@ -25,7 +25,7 @@ MIDDLEWARE += [  # NOQA
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-if os.environ.get('GITHUB_WORKFLOW'):
+if os.environ.get("GITHUB_WORKFLOW"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
