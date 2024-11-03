@@ -89,7 +89,8 @@ class TestApi(TestCase):
     def test_create_product_with_permissions(self):
         self.client.force_authenticate(user=self.superuser)
         response = self.client.post(
-            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": ANY}
+            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": ANY,
+                                            "description": "Test description", "attributes": "{}"}
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
