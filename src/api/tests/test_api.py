@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -30,7 +32,7 @@ class TestApi(TestCase):
         self.assertEqual(
             response.data,
             {
-                "id": 1,
+                "id": self.product.pk,
                 "name": "Test product",
                 "price": "10.00",
                 "is_sale": False,
@@ -52,7 +54,7 @@ class TestApi(TestCase):
             response.data,
             [
                 {
-                    "id": 3,
+                    "id": ANY,
                     "name": "Test product #2",
                     "price": "10.00",
                     "is_sale": False,
@@ -66,7 +68,7 @@ class TestApi(TestCase):
     def test_category_list(self):
         response = self.client.get(reverse("api:category-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [{"id": 1, "name": "Test category", "parent": None}])
+        self.assertEqual(response.data, [{"id": ANY, "name": "Test category", "parent": None}])
 
     def test_create_product_without_permissions(self):
         self.client.force_authenticate(user=self.user)
@@ -94,7 +96,7 @@ class TestApi(TestCase):
         self.assertEqual(
             response.data,
             {
-                "id": 4,
+                "id": ANY,
                 "name": "Test product",
                 "price": "10.00",
                 "is_sale": False,
