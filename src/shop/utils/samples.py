@@ -18,3 +18,11 @@ def sample_related_product(**params) -> RelatedProduct:
     }
     default.update(params)
     return RelatedProduct.objects.create(**default)
+
+
+def sample_category(**params) -> Category:
+    default = {
+        "name": "Test category",
+    }
+    default.update(params)
+    return Category.objects.create(**default)

@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -5,13 +7,16 @@ from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APIClient
 
-from shop.utils.samples import sample_product, sample_related_product
+from shop.utils.samples import (sample_category, sample_product,
+                                sample_related_product)
 
 
 # Create your tests here.
 class TestApi(TestCase):
     def setUp(self):
         self.client = APIClient()
+
+        self.category = sample_category()
 
         self.product = sample_product("Test product")
         self.related_product = sample_related_product()
@@ -30,14 +35,14 @@ class TestApi(TestCase):
         self.assertEqual(
             response.data,
             {
-                "id": 1,
+                "id": self.product.pk,
                 "name": "Test product",
                 "price": "10.00",
                 "is_sale": False,
                 "sale_price": None,
                 "status": "Active",
                 "images": [],
-                "category": {"id": 1, "name": "Test category"},
+                "category": {"id": self.category.pk, "name": "Test category"},
                 "description": "Test description",
                 "attributes": {},
             },
@@ -52,7 +57,7 @@ class TestApi(TestCase):
             response.data,
             [
                 {
-                    "id": 3,
+                    "id": ANY,
                     "name": "Test product #2",
                     "price": "10.00",
                     "is_sale": False,
@@ -66,12 +71,18 @@ class TestApi(TestCase):
     def test_category_list(self):
         response = self.client.get(reverse("api:category-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [{"id": 1, "name": "Test category", "parent": None}])
+        self.assertEqual(response.data, [{"id": self.category.pk, "name": "Test category", "parent": None}])
 
     def test_create_product_without_permissions(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(
-            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": 1}
+            reverse("api:product-create"),
+            {
+                "name": "Test product",
+                "price": 10,
+                "status": "Active",
+                "category": self.category.pk,
+            },
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -87,21 +98,28 @@ class TestApi(TestCase):
     def test_create_product_with_permissions(self):
         self.client.force_authenticate(user=self.superuser)
         response = self.client.post(
-            reverse("api:product-create"), {"name": "Test product", "price": 10, "status": "Active", "category": 1}
+            reverse("api:product-create"),
+            {
+                "name": "Test product",
+                "price": 10,
+                "status": "Active",
+                "category": self.category.pk,
+                "description": "Test description",
+            },
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
             response.data,
             {
-                "id": 4,
+                "id": ANY,
                 "name": "Test product",
                 "price": "10.00",
                 "is_sale": False,
                 "sale_price": None,
                 "status": "Active",
-                "category": 1,
-                "description": "",
+                "category": self.category.pk,
+                "description": "Test description",
                 "attributes": {},
             },
         )
