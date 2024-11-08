@@ -41,7 +41,11 @@
             <p class="card-text">Price: ${{ product.get_price }}</p>
         {% endif %}
         {% if product.status == 0 %}
-            <a href="#" class="btn btn-primary">Add to cart</a>
+            <form action="{% url "shop:cart_add" %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.pk }}">
+                <input type="submit" class="btn btn-primary" value="Add to cart">
+            </form>
         {% else %}
             <p>Unavailable</p>
         {% endif %}

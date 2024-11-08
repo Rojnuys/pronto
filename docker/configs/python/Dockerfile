@@ -8,6 +8,7 @@ COPY ./src ./src
 COPY ./commands ./commands
 COPY ./requirements.txt ./requirements.txt
 COPY ./static ./static
+COPY ./media ./media
 COPY ./.black.toml ./.black.toml
 COPY ./.flake8 ./.flake8
 
