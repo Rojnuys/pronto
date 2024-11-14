@@ -1,0 +1,67 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+    <div class="row mt-5">
+        <h2>Your cart</h2>
+
+        {% if cart %}
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Price per unit</th>
+                    <th>Total price</th>
+                    <th>Controls</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in cart %}
+                    <tr>
+                        <td>
+                            {% if item.product.images.count >= 1 %}
+                                <img src="{% get_media_prefix %}{{ item.product.images.first.image }}"
+                                     style="width: 150px"
+                                     alt="Product {{ item.product.pk }}">
+                            {% else %}
+                                <img src="{% static "img/defaults/product.jpg" %}" style="width: 150px"
+                                     alt="Product {{ item.product.pk }}">
+                            {% endif %}
+                        </td>
+                        <td>{{ item.product.name }}</td>
+                        <td>
+                            <form action="{% url "shop:cart_change" %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ item.product.pk }}">
+                                <input type="number" min="1" max="100" name="quantity" value="{{ item.quantity }}">
+                                <input type="submit" class="btn btn-success" value="Change">
+                            </form>
+                        </td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.total_price }}</td>
+                        <td>
+                            <form action="{% url "shop:cart_remove" %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ item.product.pk }}">
+                                <input type="submit" class="btn btn-danger" value="Remove">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="4">Total price:</td>
+                    <td>{{ total_price }}</td>
+                </tr>
+                </tfoot>
+            </table>
+        {% else %}
+            <p>The cart is empty.</p>
+        {% endif %}
+    </div>
+{% endblock %}

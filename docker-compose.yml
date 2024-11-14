@@ -9,16 +9,31 @@ services:
       args:
         WORKDIR: ${WORKDIR}
     ports:
-      - "${HTTP_PORT}:8000"
+      - "${LOCAL_PORT}:${WSGI_PORT}"
     volumes:
       - ./src:${WORKDIR}/src
       - ./commands:${WORKDIR}/commands
-      - ./static:${WORKDIR}/static
+      - static_content:${WORKDIR}/static
       - media_content:${WORKDIR}/media
     env_file: .env
     command: ./commands/start_server_${MODE}.sh
     depends_on:
       - postgres
+
+  nginx:
+    container_name: nginx_${PROJECT_NAME}
+    image: nginx:1.27
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/configs/nginx:/etc/nginx/conf.d
+      - static_content:${WORKDIR}/static
+      - media_content:${WORKDIR}/media
+    env_file:
+      - .env
+    depends_on:
+      - python
 
   postgres:
     container_name: postgres_${PROJECT_NAME}
@@ -69,4 +84,5 @@ volumes:
   pg_data: {}
   pg_admin: {}
   mongo_data: {}
+  static_content: {}
   media_content: {}
