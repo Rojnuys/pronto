@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import (DetailView, ListView, RedirectView,
@@ -6,6 +7,9 @@ from django.views.generic import (DetailView, ListView, RedirectView,
 
 from shop.cart.cart import Cart
 from shop.models import Category, Product
+from shop.tasks import (generate_fake_categories_task,
+                        generate_fake_comments_task,
+                        generate_fake_products_task)
 
 
 # Create your views here.
@@ -92,3 +96,18 @@ class CartRemoveRedirectView(RedirectView):
         cart.remove(product)
 
         return redirect(self.get_redirect_url(*args, **kwargs))
+
+
+def generate_categories(request: HttpRequest) -> HttpResponse:
+    generate_fake_categories_task.delay()
+    return HttpResponse("The categories will be created soon.")
+
+
+def generate_comments(request: HttpRequest) -> HttpResponse:
+    generate_fake_comments_task.delay()
+    return HttpResponse("The comments will be created soon.")
+
+
+def generate_products(request: HttpRequest) -> HttpResponse:
+    generate_fake_products_task.delay()
+    return HttpResponse("The products will be created soon.")
