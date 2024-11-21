@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -98,16 +100,25 @@ class CartRemoveRedirectView(RedirectView):
         return redirect(self.get_redirect_url(*args, **kwargs))
 
 
-def generate_categories(request: HttpRequest) -> HttpResponse:
-    generate_fake_categories_task.delay()
+def generate_categories(request: HttpRequest, count: int = 10) -> HttpResponse:
+    if count < 1:
+        return HttpResponse("A number of categories must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+
+    generate_fake_categories_task.delay(count)
     return HttpResponse("The categories will be created soon.")
 
 
-def generate_comments(request: HttpRequest) -> HttpResponse:
-    generate_fake_comments_task.delay()
+def generate_comments(request: HttpRequest, count: int = 10) -> HttpResponse:
+    if count < 1:
+        return HttpResponse("A number of comments must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+
+    generate_fake_comments_task.delay(count)
     return HttpResponse("The comments will be created soon.")
 
 
-def generate_products(request: HttpRequest) -> HttpResponse:
-    generate_fake_products_task.delay()
+def generate_products(request: HttpRequest, count: int = 10) -> HttpResponse:
+    if count < 1:
+        return HttpResponse("A number of products must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+
+    generate_fake_products_task.delay(count)
     return HttpResponse("The products will be created soon.")

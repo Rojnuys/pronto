@@ -6,15 +6,15 @@ from shop.utils.generate_fake_data import (generate_fake_categories,
 
 
 @shared_task
-def generate_fake_categories_task():
-    generate_fake_categories()
+def generate_fake_categories_task(count: int = 10):
+    generate_fake_categories(count)
 
 
 @shared_task
-def generate_fake_comments_task():
-    generate_fake_comments()
+def generate_fake_comments_task(count: int = 10):
+    generate_fake_comments(count)
 
 
 @shared_task
-def generate_fake_products_task():
-    generate_fake_products()
+def generate_fake_products_task(count: int = 10):
+    generate_fake_products(count)

@@ -17,6 +17,9 @@ urlpatterns = [
     path("cart/change", CartChangeAmountRedirectView.as_view(), name="cart_change"),
     path("cart/remove", CartRemoveRedirectView.as_view(), name="cart_remove"),
     path("generate/categories", generate_categories, name="generate_categories"),
+    path("generate/categories/<int:count>", generate_categories, name="generate_categories"),
     path("generate/products", generate_products, name="generate_products"),
+    path("generate/products/<int:count>", generate_products, name="generate_products"),
     path("generate/comments", generate_comments, name="generate_comments"),
+    path("generate/comments/<int:count>", generate_comments, name="generate_comments"),
 ]
