@@ -30,8 +30,7 @@ services:
       - ./docker/configs/nginx:/etc/nginx/conf.d
       - static_content:${WORKDIR}/static
       - media_content:${WORKDIR}/media
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       - python
 
@@ -44,45 +43,103 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
-  pgadmin:
-    container_name: pgadmin_${PROJECT_NAME}
-    image: dpage/pgadmin4
-    ports:
-      - "${PGADMIN_PORT}:80"
-    volumes:
-      - pg_admin:/var/lib/pgadmin
-    env_file:
-      - .env
+  redis:
+    container_name: redis_${PROJECT_NAME}
+    image: redis:alpine3.18
+    env_file: .env
+    restart: on-failure
     depends_on:
-      - postgres
-    restart: on-failure
+      - python
 
-  mongo:
-    container_name: mongodb_${PROJECT_NAME}
-    image: mongo:7-jammy
+  redisadmin:
+    container_name: redisadmin_${PROJECT_NAME}
+    image: redislabs/redisinsight
     ports:
-      - "${MONGO_PORT}:27017"
-    volumes:
-      - mongo_data:/data/db
-    env_file:
-      - .env
+      - "${REDIS_ADMIN_PORT}:5540"
+    env_file: .env
     restart: on-failure
-
-  mongo_express:
-    container_name: mongo_express_${PROJECT_NAME}
-    image: mongo-express:latest
-    ports:
-      - "${ME_PORT}:8081"
-    env_file:
-      - .env
     depends_on:
-      - mongo
+      - redis
+
+  celery:
+    container_name: celery_${PROJECT_NAME}
+    build:
+      context: ./
+      dockerfile: docker/configs/python/Dockerfile
+      args:
+        WORKDIR: ${WORKDIR}
+    volumes:
+      - ./src:${WORKDIR}
+      - ./commands:${WORKDIR}/commands
+      - media_content:${WORKDIR}/media
+    env_file: .env
+    environment:
+      CELERY_GENERATE_IMAGE: 1
     restart: on-failure
+    command:
+      - ./commands/start_celery.sh
+    ports:
+      - "${FLOWER_PORT}:5555"
+    depends_on:
+      - redis
+      - python
+
+  celerybeat:
+    container_name: celerybeat_${PROJECT_NAME}
+    build:
+      context: ./
+      dockerfile: docker/configs/python/Dockerfile
+      args:
+        WORKDIR: ${WORKDIR}
+    volumes:
+      - ./src:${WORKDIR}
+      - ./commands:${WORKDIR}/commands
+    env_file: .env
+    restart: on-failure
+    command: ./commands/start_celerybeat.sh
+    depends_on:
+      - redis
+      - python
+
+#  pgadmin:
+#    container_name: pgadmin_${PROJECT_NAME}
+#    image: dpage/pgadmin4
+#    ports:
+#      - "${PGADMIN_PORT}:80"
+#    volumes:
+#      - pg_admin:/var/lib/pgadmin
+#    env_file:
+#      - .env
+#    depends_on:
+#      - postgres
+#    restart: on-failure
+#
+#  mongo:
+#    container_name: mongodb_${PROJECT_NAME}
+#    image: mongo:7-jammy
+#    ports:
+#      - "${MONGO_PORT}:27017"
+#    volumes:
+#      - mongo_data:/data/db
+#    env_file:
+#      - .env
+#    restart: on-failure
+#
+#  mongo_express:
+#    container_name: mongo_express_${PROJECT_NAME}
+#    image: mongo-express:latest
+#    ports:
+#      - "${ME_PORT}:8081"
+#    env_file:
+#      - .env
+#    depends_on:
+#      - mongo
+#    restart: on-failure
 
 
 volumes:
   pg_data: {}
-  pg_admin: {}
-  mongo_data: {}
+#  pg_admin: {}
+#  mongo_data: {}
   static_content: {}
   media_content: {}

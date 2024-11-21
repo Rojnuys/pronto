@@ -27,10 +27,10 @@
                 <ul class="dropdown-menu" aria-labelledby="catalogDropdown">
                     {% get_catalog_data as categories %}
                     {% for category in categories %}
-                        <li class="{% if category.children.count > 1 %}dropdown-submenu{% else %}nav-item{% endif %}">
-                            <a class="{% if category.children.count > 1 %}dropdown-item dropdown-toggle{% else %}nav-link{% endif %}"
+                        <li class="{% if category.children.count >= 1 %}dropdown-submenu{% else %}nav-item{% endif %}">
+                            <a class="{% if category.children.count >= 1 %}dropdown-item dropdown-toggle{% else %}nav-link{% endif %}"
                                href="{% url "shop:category_products_list" pk=category.pk %}">{{ category.name }}</a>
-                            {% if category.children.count > 1 %}
+                            {% if category.children.count >= 1 %}
                                 <ul class="dropdown-menu">
                                     {% for subcategory in category.children.all %}
                                         <li>

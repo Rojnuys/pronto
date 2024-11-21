@@ -31,4 +31,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR.parent / "static"  # NOQA
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR.parent / "media"  # NOQA
+if os.environ.get("CELERY_GENERATE_IMAGE"):
+    MEDIA_ROOT = BASE_DIR / "media"  # NOQA
+else:
+    MEDIA_ROOT = BASE_DIR.parent / "media"  # NOQA
