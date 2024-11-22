@@ -1,0 +1,61 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Order {{ order.pk }}{% endblock %}
+
+{% block content %}
+    <div class="row mt-5">
+        <section class="container py-5">
+            <div class="row">
+                <div class="card product-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            (#{{ order.pk }}) {{ order.created_at }}
+                        </h5>
+                        <p class="card-text">
+                        <table class="w-100">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price per unit</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for op in order.orderproduct_set.all %}
+                                <tr>
+                                    <td>
+                                        {% if op.product.images.count >= 1 %}
+                                            <img src="{% get_media_prefix %}{{ op.product.images.first.image }}"
+                                                 style="width: 150px"
+                                                 alt="Product {{ op.product.pk }}">
+                                        {% else %}
+                                            <img src="{% static "img/defaults/product.jpg" %}" style="width: 150px"
+                                                 alt="Product {{ op.product.pk }}">
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url "shop:product_detail" pk=op.product.pk %}">{{ op.product.name }}</a>
+                                    </td>
+                                    <td>{{ op.quantity }}</td>
+                                    <td>{{ op.price_at_purchase }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td>Toutal price: {{ total_price }}</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        </p>
+                        <p>Address: {{ order.address }}</p>
+                        <p>Status: {{ order.status_text }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

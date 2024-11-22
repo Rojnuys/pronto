@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm registration in LMS</title>
+</head>
+<body>
+    <h2>Hi, {{ user.first_name|title }} {{ user.last_name|title }}</h2>
+    <p>Follow this link to confirm registration in LMS</p>
+    <a href="{{ http_protocol }}://{{ domain }}{% url "activate_user" uuid64=uuid64 token=token %}">Confirm</a>
+</body>
+</html>

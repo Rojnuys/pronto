@@ -58,6 +58,12 @@
                     <td colspan="4">Total price:</td>
                     <td>{{ total_price }}</td>
                 </tr>
+                <tr>
+                    <td colspan="4"></td>
+                    <td>
+                        <a class="btn btn-outline-primary mt-5" href="{% url "shop:order_create" %}">Make an order</a>
+                    </td>
+                </tr>
                 </tfoot>
             </table>
         {% else %}

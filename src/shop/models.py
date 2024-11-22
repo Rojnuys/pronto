@@ -159,6 +159,10 @@ class Order(BaseShopModel):
     class Meta:
         ordering = ["-created_at"]
 
+    @property
+    def status_text(self):
+        return self.get_status_display()
+
     def __str__(self):
         return f"{self.user.email} - {self.created_at}"
 
