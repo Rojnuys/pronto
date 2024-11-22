@@ -18,7 +18,7 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(LoginRequiredMixin, LogoutView):
-    ...
+    pass
 
 
 class UserRegistrationView(CreateView):
