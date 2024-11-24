@@ -56,6 +56,35 @@
                 <li class="nav-item"><a class="nav-link" href="#">Contacts</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url "shop:cart" %}">Cart</a></li>
             </ul>
+            <div class="dropdown text-end mx-3">
+                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if user.is_authenticated %}
+                            <img src="{% static "img/defaults/avatar.webp" %}" alt="mdo" width="32"
+                                 height="32" class="rounded-circle">
+                        {% else %}
+                            <img src="{% static "img/defaults/avatar.webp" %}" alt="mdo" width="32"
+                                 height="32" class="rounded-circle">
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                        {% if user.is_authenticated %}
+{#                            <li><a class="dropdown-item" href="{% url "profile" pk=user.userprofile.pk %}">Profile</a>#}
+{#                            </li>#}
+                            <li><a class="dropdown-item" href="#">{{ user.first_name }} {{ user.last_name }}</a></li>
+                            <li><a class="dropdown-item" href="{% url "shop:order_list" %}">Orders</a></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button class="dropdown-item" type="submit">logout</button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url "login" %}">Login</a></li>
+                            <li><a class="dropdown-item" href="{% url "registration" %}">Registration</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
         </div>
     </div>
 </nav>

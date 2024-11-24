@@ -4,7 +4,7 @@ from shop.views import (CartAddRedirectView, CartChangeAmountRedirectView,
                         CartRemoveRedirectView, CartTemplateView,
                         CategoryProductsListView, ProductDetailView,
                         ProductListView, generate_categories,
-                        generate_comments, generate_products)
+                        generate_comments, generate_products, OrderCreateView, OrderListView, OrderDetailView)
 
 app_name = "shop"
 
@@ -16,6 +16,9 @@ urlpatterns = [
     path("cart/add", CartAddRedirectView.as_view(), name="cart_add"),
     path("cart/change", CartChangeAmountRedirectView.as_view(), name="cart_change"),
     path("cart/remove", CartRemoveRedirectView.as_view(), name="cart_remove"),
+    path("order/create", OrderCreateView.as_view(), name="order_create"),
+    path("orders", OrderListView.as_view(), name="order_list"),
+    path("order/<int:pk>", OrderDetailView.as_view(), name="order_detail"),
     path("generate/categories", generate_categories, name="generate_categories"),
     path("generate/categories/<int:count>", generate_categories, name="generate_categories"),
     path("generate/products", generate_products, name="generate_products"),

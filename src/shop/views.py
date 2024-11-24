@@ -1,14 +1,16 @@
 from http import HTTPStatus
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import (DetailView, ListView, RedirectView,
-                                  TemplateView)
+                                  TemplateView, CreateView)
 
 from shop.cart.cart import Cart
-from shop.models import Category, Product
+from shop.forms import OrderForm
+from shop.models import Category, Product, Order, OrderProduct
 from shop.tasks import (generate_fake_categories_task,
                         generate_fake_comments_task,
                         generate_fake_products_task)
@@ -48,6 +50,58 @@ class CategoryProductsListView(ListView):
         return Product.objects.filter(
             Q(category_id=self.kwargs["pk"]) | Q(category_id__in=category_ids)
         ).prefetch_related("images")
+
+
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    context_object_name = "orders"
+    template_name = "shop/orders/order_list.html"
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = "shop/orders/order_detail.html"
+    context_object_name = "order"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        total_price = 0
+        for item in self.object.orderproduct_set.all():
+            total_price += item.price_at_purchase * item.quantity
+
+        context["total_price"] = total_price
+        return context
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).prefetch_related("orderproduct_set")
+
+
+class OrderCreateView(LoginRequiredMixin, CreateView):
+    form_class = OrderForm
+    template_name = "shop/orders/order_create.html"
+    success_url = reverse_lazy("index")
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+
+        cart = Cart(self.request)
+        for item in cart:
+            OrderProduct.objects.create(
+                order=self.object,
+                product=item["product"],
+                quantity=item["quantity"],
+                price_at_purchase=item["price"]
+            )
+        cart.clear()
+
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class CartTemplateView(TemplateView):
