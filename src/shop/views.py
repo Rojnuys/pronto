@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Avg
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -9,8 +9,8 @@ from django.views.generic import (DetailView, ListView, RedirectView,
                                   TemplateView, CreateView)
 
 from shop.cart.cart import Cart
-from shop.forms import OrderForm
-from shop.models import Category, Product, Order, OrderProduct
+from shop.forms import OrderForm, CommentForm
+from shop.models import Category, Product, Order, OrderProduct, Comment
 from shop.tasks import (generate_fake_categories_task,
                         generate_fake_comments_task,
                         generate_fake_products_task)
@@ -26,12 +26,51 @@ class ProductListView(ListView):
         return Product.objects.all().prefetch_related("images")
 
 
+class ProductSearchListView(ListView):
+    model = Product
+    context_object_name = "products"
+    template_name = "shop/product_list.html"
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Product.objects.filter(name__icontains=self.request.GET.get("search", "").strip()).prefetch_related("images")
+
+
 class ProductDetailView(DetailView):
     model = Product
     context_object_name = "product"
 
     def get_queryset(self):
         return Product.objects.all().prefetch_related("images").prefetch_related("related_products")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = CommentForm()
+        context["average_rating"] = self.get_object().comments.filter( is_allowed=True).aggregate(average_rating=Avg("rating"))["average_rating"]
+        if context["average_rating"]:
+            context["average_rating"] = round(context["average_rating"], 1)
+        else:
+            context["average_rating"] = 0
+        context["comment_count"] = self.get_object().comments.filter( is_allowed=True).count()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.product = self.get_object()
+            comment.save()
+            return HttpResponseRedirect(reverse("shop:product_detail", kwargs={"pk": self.get_object().pk}))
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class CommentListView(ListView):
+    model = Comment
+    context_object_name = "comments"
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Comment.objects.filter(product_id=self.kwargs["pk"], is_allowed=True)
 
 
 class CategoryProductsListView(ListView):
@@ -46,10 +85,9 @@ class CategoryProductsListView(ListView):
         return context
 
     def get_queryset(self):
-        category_ids = Category.objects.filter(parent__id=self.kwargs["pk"]).values("id")
-        return Product.objects.filter(
-            Q(category_id=self.kwargs["pk"]) | Q(category_id__in=category_ids)
-        ).prefetch_related("images")
+        category = Category.objects.get(pk=self.kwargs["pk"])
+        categories = [category] + category.get_all_subcategories()
+        return Product.objects.filter(category__in=categories).prefetch_related("images")
 
 
 class OrderListView(LoginRequiredMixin, ListView):

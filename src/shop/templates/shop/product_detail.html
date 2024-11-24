@@ -1,5 +1,7 @@
 {% extends "index.html" %}
 {% load static %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -88,5 +90,19 @@
                 </div>
             </section>
         {% endif %}
+
+        <h3 class="mb-5">
+            <a href="{% url "shop:product_comments" pk=product.pk %}">Comments: count ({{ comment_count }}),
+                avg rating ({{ average_rating }})</a>
+        </h3>
+
+        <h2 class="mb-5">Create Comment</h2>
+        <form method="post" enctype="multipart/form-data" class="form-container">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="d-flex justify-content-end">
+                <input type="submit" class="btn btn-outline-primary mt-3" value="Create">
+            </div>
+        </form>
     </div>
 {% endblock %}
