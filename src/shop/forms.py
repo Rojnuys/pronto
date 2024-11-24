@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from shop.models import Order
+from shop.models import Order, Comment
 
 
 class OrderForm(forms.ModelForm):
@@ -17,3 +17,9 @@ class OrderForm(forms.ModelForm):
             raise ValidationError("Address must consist of at least 5 characters")
 
         return address
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["rating", "content", "advantages", "disadvantages"]

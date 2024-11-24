@@ -34,10 +34,13 @@
                                 <ul class="dropdown-menu">
                                     {% for subcategory in category.children.all %}
                                         <li>
-                                            <a class="dropdown-item" href="{% url "shop:category_products_list" pk=subcategory.pk %}">{{ subcategory.name }}</a>
+                                            <a class="dropdown-item"
+                                               href="{% url "shop:category_products_list" pk=subcategory.pk %}">{{ subcategory.name }}</a>
                                             <ul>
                                                 {% for subsubcategory in subcategory.children.all %}
-                                                    <li><a href="{% url "shop:category_products_list" pk=subsubcategory.pk %}">{{ subsubcategory.name }}</a></li>
+                                                    <li>
+                                                        <a href="{% url "shop:category_products_list" pk=subsubcategory.pk %}">{{ subsubcategory.name }}</a>
+                                                    </li>
                                                 {% endfor %}
                                             </ul>
                                         </li>
@@ -49,47 +52,48 @@
                     <li class="nav-item"><a class="nav-link" href="{% url "shop:product_list" %}">All products</a></li>
                 </ul>
             </li>
+        <form class="form-inline my-2 my-lg-0 d-flex" method="get" action="{% url "shop:product_search" %}">
+            <input class="form-control mr-sm-2" name="search" value="{{ request.GET.search }}" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-primary my-2 my-sm-0 ms-2" type="submit">Search</button>
+        </form>
         </ul>
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#">Contacts</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url "shop:cart" %}">Cart</a></li>
             </ul>
             <div class="dropdown text-end mx-3">
-                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if user.is_authenticated %}
-                            <img src="{% static "img/defaults/avatar.webp" %}" alt="mdo" width="32"
-                                 height="32" class="rounded-circle">
-                        {% else %}
-                            <img src="{% static "img/defaults/avatar.webp" %}" alt="mdo" width="32"
-                                 height="32" class="rounded-circle">
-                        {% endif %}
-                    </a>
-                    <ul class="dropdown-menu text-small">
-                        {% if user.is_authenticated %}
-{#                            <li><a class="dropdown-item" href="{% url "profile" pk=user.userprofile.pk %}">Profile</a>#}
-{#                            </li>#}
-                            <li><a class="dropdown-item" href="#">{{ user.first_name }} {{ user.last_name }}</a></li>
-                            <li><a class="dropdown-item" href="{% url "shop:order_list" %}">Orders</a></li>
-                            <li>
-                                <form method="post" action="{% url 'logout' %}">
-                                    {% csrf_token %}
-                                    <button class="dropdown-item" type="submit">logout</button>
-                                </form>
-                            </li>
-                        {% else %}
-                            <li><a class="dropdown-item" href="{% url "login" %}">Login</a></li>
-                            <li><a class="dropdown-item" href="{% url "registration" %}">Registration</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
+                <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if user.is_authenticated %}
+                        <img src="{% static "img/defaults/avatar.webp" %}" alt="mdo" width="32"
+                             height="32" class="rounded-circle">
+                    {% else %}
+                        <img src="{% static "img/defaults/avatar.webp" %}" alt="mdo" width="32"
+                             height="32" class="rounded-circle">
+                    {% endif %}
+                </a>
+                <ul class="dropdown-menu text-small">
+                    {% if user.is_authenticated %}
+                        <li><a class="dropdown-item" href="#">{{ user.first_name }} {{ user.last_name }}</a></li>
+                        <li><a class="dropdown-item" href="{% url "shop:order_list" %}">Orders</a></li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button class="dropdown-item" type="submit">logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a class="dropdown-item" href="{% url "login" %}">Login</a></li>
+                        <li><a class="dropdown-item" href="{% url "registration" %}">Registration</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
 </nav>
 
-<div class="container">
+<div class="container content">
     {% block content %}
         <!-- Carousel (Slider) -->
         <section id="main-slider" class="mb-5">
@@ -173,7 +177,7 @@
 
 <footer class="footer text-center mt-5">
     <div class="container">
-        <p>&copy; 2023 Online shop. All the rights are protected.</p>
+        <p>&copy; 2024 Online shop. Python Pro.</p>
         <p>
             <a href="#">Facebook</a> |
             <a href="#">Instagram</a> |

@@ -15,6 +15,13 @@ class Category(BaseShopModel):
     parent = models.ForeignKey("self", null=True, blank=True, related_name="children", on_delete=models.CASCADE)
     name = models.CharField(_("name"), max_length=100, unique=True)
 
+    def get_all_subcategories(self):
+        subcategories = []
+        for child in self.children.all():
+            subcategories.append(child)
+            subcategories.extend(child.get_all_subcategories())
+        return subcategories
+
     class Meta:
         verbose_name_plural = "Categories"
 
