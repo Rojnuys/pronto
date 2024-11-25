@@ -5,7 +5,7 @@ from shop.views import (CartAddRedirectView, CartChangeAmountRedirectView,
                         CategoryProductsListView, ProductDetailView,
                         ProductListView, generate_categories,
                         generate_comments, generate_products, OrderCreateView, OrderListView, OrderDetailView,
-                        CommentListView, ProductSearchListView)
+                        CommentListView, ProductSearchListView, generate_slider_items)
 
 app_name = "shop"
 
@@ -28,4 +28,6 @@ urlpatterns = [
     path("generate/products/<int:count>", generate_products, name="generate_products"),
     path("generate/comments", generate_comments, name="generate_comments"),
     path("generate/comments/<int:count>", generate_comments, name="generate_comments"),
+    path("generate/slider-items", generate_slider_items, name="generate_slider_items"),
+    path("generate/slider-items/<int:count>", generate_slider_items, name="generate_slider_items"),
 ]

@@ -7,7 +7,7 @@ from faker import Faker
 
 from common.utils.helpers import fetch_pic
 from shop.models import (Category, Comment, Product, ProductImage, Rating,
-                         RelatedProduct, Status)
+                         RelatedProduct, Status, SliderItem)
 
 
 def generate_fake_categories(count: int = 10):
@@ -73,3 +73,19 @@ def generate_fake_products(count: int = 10):
                 )
             except Exception:
                 ...
+
+
+def generate_fake_slider_items(count: int = 5):
+    fake = Faker()
+    for i in range(count):
+        try:
+            SliderItem.objects.create(
+                title=fake.sentence(nb_words=5),
+                description=fake.sentence(nb_words=10),
+                image=ContentFile(
+                    fetch_pic(), name="".join(random.choices(string.ascii_letters + string.digits, k=10))
+                ),
+                order_number=i + 1,
+            )
+        except Exception:
+            ...
