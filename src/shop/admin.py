@@ -3,7 +3,7 @@ from django.db.models import JSONField
 from django_json_widget.widgets import JSONEditorWidget
 
 from shop.models import (Category, Comment, Order, OrderProduct, Product,
-                         ProductImage, RelatedProduct)
+                         ProductImage, RelatedProduct, SliderItem)
 
 
 # Register your models here.
@@ -54,3 +54,8 @@ class OrderProductInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["created_at", "updated_at", "status"]
     inlines = [OrderProductInline]
+
+
+@admin.register(SliderItem)
+class SliderItemAdmin(admin.ModelAdmin):
+    list_display = ["order_number", "title"]

@@ -13,8 +13,8 @@ services:
     volumes:
       - ./src:${WORKDIR}/src
       - ./commands:${WORKDIR}/commands
-      - static_content:${WORKDIR}/static
-      - media_content:${WORKDIR}/media
+      - ./static:${WORKDIR}/static
+      - ./media:${WORKDIR}/media
     env_file: .env
     command: ./commands/start_server_${MODE}.sh
     depends_on:
@@ -28,8 +28,8 @@ services:
       - "443:443"
     volumes:
       - ./docker/configs/nginx:/etc/nginx/conf.d
-      - static_content:${WORKDIR}/static
-      - media_content:${WORKDIR}/media
+      - ./static:${WORKDIR}/static
+      - ./media:${WORKDIR}/media
     env_file: .env
     depends_on:
       - python
@@ -51,15 +51,15 @@ services:
     depends_on:
       - python
 
-  redisadmin:
-    container_name: redisadmin_${PROJECT_NAME}
-    image: redislabs/redisinsight
-    ports:
-      - "${REDIS_ADMIN_PORT}:5540"
-    env_file: .env
-    restart: on-failure
-    depends_on:
-      - redis
+#  redisadmin:
+#    container_name: redisadmin_${PROJECT_NAME}
+#    image: redislabs/redisinsight
+#    ports:
+#      - "${REDIS_ADMIN_PORT}:5540"
+#    env_file: .env
+#    restart: on-failure
+#    depends_on:
+#      - redis
 
   celery:
     container_name: celery_${PROJECT_NAME}
@@ -71,7 +71,7 @@ services:
     volumes:
       - ./src:${WORKDIR}
       - ./commands:${WORKDIR}/commands
-      - media_content:${WORKDIR}/media
+      - ./media:${WORKDIR}/media
     env_file: .env
     environment:
       CELERY_GENERATE_IMAGE: 1
@@ -84,22 +84,22 @@ services:
       - redis
       - python
 
-  celerybeat:
-    container_name: celerybeat_${PROJECT_NAME}
-    build:
-      context: ./
-      dockerfile: docker/configs/python/Dockerfile
-      args:
-        WORKDIR: ${WORKDIR}
-    volumes:
-      - ./src:${WORKDIR}
-      - ./commands:${WORKDIR}/commands
-    env_file: .env
-    restart: on-failure
-    command: ./commands/start_celerybeat.sh
-    depends_on:
-      - redis
-      - python
+#  celerybeat:
+#    container_name: celerybeat_${PROJECT_NAME}
+#    build:
+#      context: ./
+#      dockerfile: docker/configs/python/Dockerfile
+#      args:
+#        WORKDIR: ${WORKDIR}
+#    volumes:
+#      - ./src:${WORKDIR}
+#      - ./commands:${WORKDIR}/commands
+#    env_file: .env
+#    restart: on-failure
+#    command: ./commands/start_celerybeat.sh
+#    depends_on:
+#      - redis
+#      - python
 
 #  pgadmin:
 #    container_name: pgadmin_${PROJECT_NAME}
@@ -141,5 +141,5 @@ volumes:
   pg_data: {}
 #  pg_admin: {}
 #  mongo_data: {}
-  static_content: {}
-  media_content: {}
+#  static_content: {}
+#  media_content: {}

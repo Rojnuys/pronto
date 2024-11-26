@@ -13,7 +13,7 @@ from shop.forms import OrderForm, CommentForm
 from shop.models import Category, Product, Order, OrderProduct, Comment
 from shop.tasks import (generate_fake_categories_task,
                         generate_fake_comments_task,
-                        generate_fake_products_task)
+                        generate_fake_products_task, generate_fake_slider_items_task)
 
 
 # Create your views here.
@@ -192,6 +192,38 @@ class CartRemoveRedirectView(RedirectView):
         return redirect(self.get_redirect_url(*args, **kwargs))
 
 
+# def generate_categories(request: HttpRequest, count: int = 10) -> HttpResponse:
+#     if count < 1:
+#         return HttpResponse("A number of categories must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+#
+#     generate_fake_categories(count)
+#     return HttpResponse("The categories are created.")
+#
+#
+# def generate_comments(request: HttpRequest, count: int = 10) -> HttpResponse:
+#     if count < 1:
+#         return HttpResponse("A number of comments must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+#
+#     generate_fake_comments(count)
+#     return HttpResponse("The comments are created.")
+#
+#
+# def generate_products(request: HttpRequest, count: int = 10) -> HttpResponse:
+#     if count < 1:
+#         return HttpResponse("A number of products must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+#
+#     generate_fake_products(count)
+#     return HttpResponse("The products are created.")
+#
+#
+# def generate_slider_items(request: HttpRequest, count: int = 5) -> HttpResponse:
+#     if count < 1:
+#         return HttpResponse("A number of slider's items must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+#
+#     generate_fake_slider_items(count)
+#     return HttpResponse("The slider's items are created.")
+
+
 def generate_categories(request: HttpRequest, count: int = 10) -> HttpResponse:
     if count < 1:
         return HttpResponse("A number of categories must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
@@ -214,3 +246,11 @@ def generate_products(request: HttpRequest, count: int = 10) -> HttpResponse:
 
     generate_fake_products_task.delay(count)
     return HttpResponse("The products will be created soon.")
+
+
+def generate_slider_items(request: HttpRequest, count: int = 5) -> HttpResponse:
+    if count < 1:
+        return HttpResponse("A number of slider's items must be greater than zero.", status=HTTPStatus.BAD_REQUEST)
+
+    generate_fake_slider_items_task.delay(count)
+    return HttpResponse("The slider's items will be created soon.")

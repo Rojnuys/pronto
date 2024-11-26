@@ -185,3 +185,29 @@ class OrderProduct(BaseShopModel):
 
     def __str__(self):
         return f"{self.product.name} - {self.quantity} in Order {self.order}"
+
+
+class SliderItem(BaseShopModel):
+    title = models.CharField(_("title"), max_length=100, null=True, blank=True)
+    description = models.CharField(_("description"), max_length=150, null=True, blank=True)
+    image = models.ImageField(
+        _("image"),
+        upload_to="sliders",
+        max_length=15 * 1024,
+        validators=[validators.FileExtensionValidator(allowed_extensions=settings.ALLOWED_IMAGE_EXTENSIONS)],
+    )
+    order_number = models.PositiveSmallIntegerField(
+        _("order number"),
+        default=1,
+        validators=[
+            validators.MinValueValidator(1),
+            validators.MaxValueValidator(12),
+        ],
+        unique=True
+    )
+
+    class Meta:
+        ordering = ["order_number"]
+
+    def __str__(self):
+        return f"{self.order_number} - {self.title}"
